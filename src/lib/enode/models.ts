@@ -113,3 +113,25 @@ export interface ListVehiclesResponse {
   data: VehicleData[];
   pagination: Pagination;
 }
+
+export interface Action {
+  action: string;
+}
+
+export interface ActionResponse {
+  id: string,
+  userId: string,
+  createdAt: string,
+  updatedAt: string,
+  completedAt: null | string,
+  state: string,
+  targetId: string,
+  targetType: string,
+  kind: string,
+  failureReason: null | FailureReason
+}
+
+export interface FailureReason {
+  type: string,
+  datail: string
+}

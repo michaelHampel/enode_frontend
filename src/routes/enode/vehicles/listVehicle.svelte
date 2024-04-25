@@ -10,14 +10,13 @@
     }
   </script>
 
-<div class="vehicle-info-container">
 <div class="vehicle-info">
    <h2><b>VehicleInfo: </b></h2> 
-    <p>Id: {vehicle_data.id}</p>
-    <p>User Id: {vehicle_data.userId}</p>
-    <p>Vendor: {vehicle_data.vendor}</p>
-    <p>Is Reachable: {vehicle_data.isReachable}</p>
-    <p>Last Seen: {vehicle_data.lastSeen}</p>
+    <p><b>ID: </b>{vehicle_data.id}</p>
+    <p><b>User ID: </b>{vehicle_data.userId}</p>
+    <p><b>Vendor: </b>{vehicle_data.vendor}</p>
+    <p><b>Is Reachable: </b>{vehicle_data.isReachable}</p>
+    <p><b>Last Seen: </b>{vehicle_data.lastSeen}</p>
     <h3 on:click={() => toggleSection('general')}><b>General: </b></h3>
     <div class={openSections.general ? '' : 'hidden'}>
         <p>VIN: {vehicle_data.information.vin}</p>
@@ -58,7 +57,7 @@
         <p>Distance: {vehicle_data.odometer.distance}</p>
         <p>Last Updated (Odometer): {vehicle_data.odometer.lastUpdated}</p>
     </div>
-    <h3><b>Scopes:</b></h3><p> {vehicle_data.scopes ? vehicle_data.scopes.join(', ') : 'No scopes available.'}</p>
+    <p><b>Scopes:</b> {vehicle_data.scopes ? vehicle_data.scopes.join(', ') : 'No scopes available.'}</p>
     <h3 on:click={() => toggleSection('capabilities')}><b>Capabilities: </b></h3>
     <div class={openSections.capabilities ? '' : 'hidden'}>
         <ul>
@@ -75,20 +74,10 @@
     </div>
     <p>Location Id: {vehicle_data.locationId}</p>
 </div>
-</div>
 
 
 <style>
-    .vehicle-info-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-  
     .vehicle-info {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
       padding: 1rem;
       border: 1px solid #ddd;
       border-radius: 4px;
