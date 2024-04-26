@@ -1,31 +1,29 @@
 <script lang="ts">
-    export let action_response: Array<{key: string, value: any}>;
+    import type { EnodeActionResponse } from "$lib/enode/models";
 
-    export function getInterfaceMembers<T>(obj: T): Array<{key: string, value: any}> {
+    export let action_response: EnodeActionResponse;
+
+    function getInterfaceMembers<T>(obj: T): {[key: string]: any} {
         const indexableObj = obj as {[key: string]: any};
-        return Object.keys(indexableObj).map(key => ({key, value: indexableObj[key]}));
-    }
+        let result: {[key: string]: any} = {};
+        for (const key of Object.keys(indexableObj)) {
+            const value = indexableObj[key];
+            if (typeof value === 'object' && value !== null) {
+                result[key] = getInterfaceMembers(value);
+            } else {
+                result[key] = value;
+            }
+        }
+        return result;
+}
   </script>
 
 <div>
     <h2><b>Action Response: </b></h2>
 </div>
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Value</th>
-        </tr>
-    </thead>
-    <tbody>
-        {#each action_response as { key, value }}
-            <tr>
-                <td>{key}</td>
-                <td>{value}</td>
-            </tr>
-        {/each}
-    </tbody>
-</table>
+<pre>
+    {JSON.stringify(getInterfaceMembers(action_response), null, 2)}
+</pre>
   
   <style>
     p {

@@ -1,3 +1,4 @@
+
 export interface ListUserModel {
     id: string;
     createdAt: string;
@@ -118,7 +119,7 @@ export interface Action {
   action: string;
 }
 
-export interface ActionResponse {
+export interface EnodeActionResponse {
   id: string,
   userId: string,
   createdAt: string,
@@ -135,3 +136,16 @@ export interface FailureReason {
   type: string,
   datail: string
 }
+
+export const emptyActionResponse: EnodeActionResponse = {
+  id: '',
+  userId: '',
+  createdAt: '',
+  updatedAt: '',
+  completedAt: null,
+  state: '',
+  targetId: '',
+  targetType: '',
+  kind: '',
+  failureReason: null
+};

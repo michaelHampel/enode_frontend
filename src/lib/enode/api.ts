@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
-import { emptyListUsersResponse, type ActionResponse, type EnodeUser, type LinkUserResponse, type ListUsersResponse, type ListVehiclesResponse, type VehicleData } from "./models";
-import { type Either, left, right, isLeft } from 'fp-ts/lib/Either';
+import { emptyListUsersResponse, type EnodeActionResponse, type EnodeUser, type LinkUserResponse, type ListUsersResponse, type ListVehiclesResponse, type VehicleData } from "./models";
+import { type Either, left, right, isLeft, isRight } from 'fp-ts/lib/Either';
 
 const serverUrl: string = 'http://127.0.0.1:3000/enox/flow/enode/'; 
 
@@ -59,12 +59,24 @@ export async function listVehicles(): Promise<Result<ListVehiclesResponse>> {
   return sendGet(uri, 'getting vehicles: ');
 }
 
+export async function getVehicleIds(): Promise<Result<string[]>> {
+  const uri ="vehicles";
+  const ids: string[] = [];
+  let res: Result<ListVehiclesResponse> = await sendGet(uri, 'getting vehicles: ');
+  if(isRight(res)) {
+    res.right.data.forEach(data => ids.push(data.id))
+    return right(ids)
+  }
+  return res
+  }
+
+
 export async function getVehicle(vehicleId: string): Promise<Result<VehicleData>> {
   const uri = "vehicles/" + vehicleId;
   return sendGet(uri, 'getting vehicle: ');
 }
 
-export async function setChargeAction(vehicleId: string, command: string): Promise<Result<ActionResponse>> {
+export async function setChargeAction(vehicleId: string, action: string): Promise<Result<EnodeActionResponse>> {
   const uri = "vehicles/" + vehicleId + "/charging";
   try {
     const res = await fetch( 
@@ -74,7 +86,7 @@ export async function setChargeAction(vehicleId: string, command: string): Promi
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ command })
+        body: JSON.stringify({ action })
     });
     return right(await res.json());
   } catch (error) {
@@ -83,7 +95,7 @@ export async function setChargeAction(vehicleId: string, command: string): Promi
   }
 }
 
-export async function getVehicleAction(actionId: string): Promise<Result<ActionResponse>> {
+export async function getVehicleAction(actionId: string): Promise<Result<EnodeActionResponse>> {
   const uri = "vehicles/action/" + actionId;
   return sendGet(uri, 'getting vehicle action: ');
 }
