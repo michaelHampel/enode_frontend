@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit";
-import { emptyListUsersResponse, type EnodeActionResponse, type EnodeUser, type LinkUserResponse, type ListUsersResponse, type ListVehiclesResponse, type VehicleData } from "./models";
+
+import { emptyListUsersResponse, type EnodeActionResponse, type EnodeErrorResponse, type EnodeUser, type LinkUserResponse, type ListUsersResponse, type ListVehiclesResponse, type VehicleData } from "./models";
 import { type Either, left, right, isLeft, isRight } from 'fp-ts/lib/Either';
 
 const serverUrl: string = 'http://127.0.0.1:3000/enox/flow/enode/'; 
@@ -8,11 +8,7 @@ export type ApiError = {
   message: string;
 }
 
-export interface MyError {
-  message: string;
-}
-
-export type Result<T> = Either<ApiError, T>;
+export type Result<T> = Either<EnodeErrorResponse, T>;
 
 export async function listUsers(): Promise<Result<ListUsersResponse>> {
   const uri ="users";
@@ -31,11 +27,13 @@ export async function linkUser(userId: string, vendor: string, vendorType: strin
         },
         body: JSON.stringify({ userId, vendor, vendorType })
     });
-    return right(await res.json());
-    //return JSON.stringify(data, null, 2);
-  } catch(error) {
-    console.log(error);
-    return left<ApiError>({ message: 'APIError linking user: '+ error});
+    if (res.ok) {
+      return right(await res.json());
+    } else {
+      return left<EnodeErrorResponse>(await res.json());
+    } 
+  } catch (error) {
+    return left<EnodeErrorResponse>(handleError(error, "Error Linking User: "));
   }
 }
 
@@ -68,7 +66,7 @@ export async function getVehicleIds(): Promise<Result<string[]>> {
     return right(ids)
   }
   return res
-  }
+}
 
 
 export async function getVehicle(vehicleId: string): Promise<Result<VehicleData>> {
@@ -88,10 +86,13 @@ export async function setChargeAction(vehicleId: string, action: string): Promis
         },
         body: JSON.stringify({ action })
     });
-    return right(await res.json());
+    if (res.ok) {
+      return right(await res.json());
+    } else {
+      return left<EnodeErrorResponse>(await res.json());
+    } 
   } catch (error) {
-    console.log(error);
-    return left<ApiError>({ message: 'APIError setting ChargeAction: '+ error});
+    return left<EnodeErrorResponse>(handleError(error, "Error sending ChargeAction: "));
   }
 }
 
@@ -103,14 +104,17 @@ export async function getVehicleAction(actionId: string): Promise<Result<EnodeAc
 async function sendGet(uri: string, error_msg: string): Promise<Result<any>> {
   try {
     const res = await fetch(serverUrl + uri);
-    return right(await res.json());
+    if (res.ok) {
+      return right(await res.json());
+    } else {
+      return left<EnodeErrorResponse>(await res.json());
+    } 
   } catch (error) {
-    console.log(error);
-    return left<ApiError>({ message: '[APIError] ' + error_msg + error});
+    return left<EnodeErrorResponse>(handleError(error, error_msg));
   }
 }
 
-
-
-
-
+function handleError(error: any, error_msg: String): EnodeErrorResponse {
+  console.log(error_msg + error);
+  return { type: "EnodeError", detail: error_msg + error, error: "EnodeError", message: error_msg + error};
+}

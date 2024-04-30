@@ -1,13 +1,14 @@
 <script lang="ts">
     import { getVehicle, listUserVehicles, listVehicles, type ApiError, type Result } from "$lib/enode/api";
-    import type { ListVehiclesResponse, VehicleData } from "$lib/enode/models";
+    import type { EnodeErrorResponse, ListVehiclesResponse, VehicleData } from "$lib/enode/models";
     import { onMount } from 'svelte';
     import ListVehicle from './listVehicle.svelte';
     import { writable } from 'svelte/store';
     import { isLeft, isRight, left, right } from "fp-ts/lib/Either";
+    import ErrorResponse from "$lib/enode/errorResponse.svelte";
 
     let vehiclesResponse: Result<ListVehiclesResponse> = right({ data: [], pagination: { after: '', before: '' }});
-    let vehicleResponse: Result<VehicleData> = left<ApiError>({ message: 'Error getting vehicle'});
+    let vehicleResponse: Result<VehicleData> = left<EnodeErrorResponse>({ type: '', detail: '', error: '', message: ''});
     let userVehiclesResponse: Result<ListVehiclesResponse> = right({ data: [], pagination: { after: '', before: '' }});
     let get_vehicleId = '';
     let userId = '';
@@ -17,8 +18,6 @@
     onMount(async () => {
         await refreshVehicles();
     });
-
-    
 
     async function refreshVehicles() {
         vehiclesResponse = await listVehicles();
@@ -41,7 +40,7 @@
     {#if isRight(vehiclesResponse) }
         <ul class="grid-view">
             {#each vehiclesResponse.right.data as data }
-                <li class="grid-view-item">
+                <li>
                     <ListVehicle vehicle_data={data}/>
                 </li>
             {:else}
@@ -50,7 +49,7 @@
             {/each}
         </ul>
         {:else}
-            <p>{vehiclesResponse.left.message}</p>
+            <ErrorResponse err_response = {vehiclesResponse.left}></ErrorResponse>
     {/if}
 
     
@@ -70,7 +69,7 @@
             <p class="grid-view"><ListVehicle vehicle_data={vehicleResponse.right}/></p>
         </div>
     {:else if isLeft(vehicleResponse) && vehicle_show}
-        <p>{vehicleResponse.left.message}</p>
+        <ErrorResponse err_response = {vehicleResponse.left}></ErrorResponse>
     {/if}
 
     <pre>______________________________________________________________________________________________________________________________________</pre>
@@ -89,7 +88,7 @@
             {/each}
         </ul>
     {:else if isLeft(userVehiclesResponse) && user_vehicles_show}
-        <p>{userVehiclesResponse.left.message}</p>
+        <ErrorResponse err_response = {userVehiclesResponse.left}></ErrorResponse>
     {/if}
 </main>
 

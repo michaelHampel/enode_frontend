@@ -5,6 +5,7 @@
     import ListUser from './listUser.svelte';
     import { writable } from 'svelte/store';
     import { isLeft, isRight, right } from 'fp-ts/lib/Either';
+    import ErrorResponse from '$lib/enode/errorResponse.svelte';
 
     let listUsersResponse: Result<ListUsersResponse> = right(emptyListUsersResponse);
     let create_userId: string = '';
@@ -58,7 +59,7 @@
         {/each}
       </ul>
       {:else}
-      <p>{listUsersResponse.left.message}</p>
+        <ErrorResponse err_response = {listUsersResponse.left}></ErrorResponse>
     {/if}
     <!--button on:click={() => fetchData("users")}>Get Users</button-->
     <!-- render for pagination 
@@ -79,7 +80,7 @@
         <p>Enode Link URL: {linkResponse.right.linkUrl}</p>
       </div>
       {:else if isLeft(linkResponse) && link_user_show}
-      <p>{linkResponse.left.message}</p>
+        <ErrorResponse err_response = {linkResponse.left}></ErrorResponse>
     {/if}
 
     <pre>______________________________________________________________________________________________________________________________________</pre>
@@ -105,7 +106,7 @@
         <p>No user found with ID: {get_userId}</p>
       {/if}
       {:else if isLeft(enodeUserResponse) && get_user_show}
-      <p>{enodeUserResponse.left.message}</p>
+        <ErrorResponse err_response = {enodeUserResponse.left}></ErrorResponse>
       {/if}
 
     <pre>______________________________________________________________________________________________________________________________________</pre>
@@ -118,6 +119,6 @@
         <h3>Successfully deleted Enode User: {deletedUserId.right}</h3>
       </div>
     {:else if isLeft(deletedUserId) && delete_user_show }
-      <p>{deletedUserId.left.message}</p>
+      <ErrorResponse err_response = {deletedUserId.left}></ErrorResponse>
     {/if}
 </main>

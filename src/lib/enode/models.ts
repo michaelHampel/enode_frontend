@@ -149,3 +149,10 @@ export const emptyActionResponse: EnodeActionResponse = {
   kind: '',
   failureReason: null
 };
+
+export interface EnodeErrorResponse {
+  type: string,
+  detail: string,
+  error: string,
+  message: string
+}
